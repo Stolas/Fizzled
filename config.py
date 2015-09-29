@@ -56,7 +56,11 @@ def load_config(app_name):
         conf = load_taskmaster_config(conf)
         conf = load_autopsy_config(conf)
 
+    configure_logger(conf)
     return conf
+
+def configure_logger(conf):
+    pass
 
 if __name__ == '__main__':
     config = load_config(None) #  Load all.
