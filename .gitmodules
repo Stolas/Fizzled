@@ -1,0 +1,3 @@
+[submodule "vivisect"]
+	path = vivisect
+	url = git@github.com:vivisect/vivisect.git
