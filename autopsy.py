@@ -39,7 +39,7 @@ def print_info(trace):
     esi = trace.getRegister(REG_ESI)
     esp = trace.getRegister(REG_ESP)
 
-    logger.info("[*] Bestname: {}".format(trace.getSymByAddr(eip, exact=False)))
+    logger.info("Bestname: {}".format(trace.getSymByAddr(eip, exact=False)))
     logger.info("%16s: %s" % ("EIP", hex(eip)))
 
     try:
@@ -79,17 +79,19 @@ def run(binary, args, ttl):
         trace.sendBreak()
         print_info(trace)
 
-        logger.info("[-] Death to the process {}".format(trace.getPid()))
+        logger.info("Death to the process {}".format(trace.getPid()))
         # logger.info("  (\  /)")
         # logger.info(" ( .  .)")
         # logger.info("C(\") (\"), done and no crash. Bunny is sad..")
         trace.kill()
         trace.detach()
+        sys.exit(0)
     else:
         # TODO: Seems that isRunning isn't working that well.
-        logger.info("[+] {} crashed!".format(binary))
-        logger.info("[+] Arguments: {}".format(', '.join(args)))
+        logger.info("{} crashed!".format(binary))
+        logger.info("Arguments: {}".format(', '.join(args)))
         print_info(trace)
+        sys.exit(1)
 
 
 def load_binary(trace, binary, args):
@@ -100,7 +102,7 @@ def load_binary(trace, binary, args):
 
 if __name__ == '__main__':
     # TODO: Also add this to config so we wont need to edit code.
-    BINARY = "/usr/bin/cvlc"
+    BINARY = "/bin/ls"
     TIME_TO_LIVE = 1
     ARGUMENTS = ['-L'] + sys.argv[1:]
     run(BINARY, ARGUMENTS, TIME_TO_LIVE)
