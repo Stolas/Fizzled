@@ -9,12 +9,14 @@ DATA_DIRECTORY = 'data'
 WORK_DIRECTORY = 'work'
 SAMPLES_DIRECTORY = 'samples'
 CRASH_DIRECTORY = join(WORK_DIRECTORY, 'crash')
-BINARY = "/bin/ls"
-ARGUMENTS = ['-L'] + argv[1:]
+BINARY = "/usr/bin/evince"
+ARGUMENTS = [] + argv[1:]
 TIME_TO_LIVE = 1
 FILE_TYPE = 'pdf'
 RECOVER_TIME = 10
 TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
+# VDB_ROOT = 'vivisect'
+STRATEGY = 'charlie_miller_fuzz'
 
 # Logging
 ## Formatting
@@ -25,42 +27,44 @@ VERBOSE_FORMAT = logging.Formatter('%(levelname)s %(asctime)s %(module)s %(proce
 ## Handlers
 stream_handler = logging.StreamHandler()
 stream_handler.setLevel(logging.DEBUG)
-stream_handler.setFormatter(SIMPLE_FORMAT)
+stream_handler.setFormatter(CMD_LINE_FORMAT)
 
 file_handler = logging.FileHandler('fizzled.log')
 file_handler.setLevel(logging.DEBUG)
 
-syslog_handler = logging.SysLogHandler(address=('localhost', 514))
-syslog_handler.setLevel(logging.DEBUG)
-
-email_handler = logging.SMTPHandler('smtp.gmail.com',
-                                    'from@gmail.com',
-                                    'to@gmail.com',
-                                    'Fizzled Info',
-                                    ('username', 'password'),
-                                    secure=True)
-
-email_handler.setLevel(logging.ERROR)
+# syslog_handler = logging.SysLogHandler(address=('localhost', 514))
+# syslog_handler.setLevel(logging.DEBUG)
+#
+# email_handler = logging.SMTPHandler('smtp.gmail.com',
+#                                     'from@gmail.com',
+#                                     'to@gmail.com',
+#                                     'Fizzled Info',
+#                                     ('username', 'password'),
+#                                     secure=True)
+#
+# email_handler.setLevel(logging.ERROR)
 
 ## Loggers
 mutilator = logging.getLogger('mutilator')
 mutilator.setLevel(logging.DEBUG)
 mutilator.addHandler(stream_handler)
-mutilator.addHandler(syslog_handler)
+# mutilator.addHandler(syslog_handler)
 
 autopsy = logging.getLogger('autopsy')
 autopsy.setLevel(logging.DEBUG)
-autopsy.addHandler(stream_handler)
-autopsy.addHandler(syslog_handler)
+autopsy.addHandler(file_handler)
+# autopsy.addHandler(stream_handler)
+# autopsy.addHandler(syslog_handler)
 
 taskmaster = logging.getLogger('taskmaster')
 taskmaster.setLevel(logging.DEBUG)
 taskmaster.addHandler(stream_handler)
 
-stalker = logging.getLogger('stalker')
-stalker.setLevel(logging.DEBUG)
-stalker.addHandler(stream_handler)
-
-legion = logging.getLogger('legion')
-legion.setLevel(logging.DEBUG)
-legion.addHandler(stream_handler)
+### Not in use as of yet.
+# stalker = logging.getLogger('stalker')
+# stalker.setLevel(logging.DEBUG)
+# stalker.addHandler(stream_handler)
+#
+# legion = logging.getLogger('legion')
+# legion.setLevel(logging.DEBUG)
+# legion.addHandler(stream_handler)

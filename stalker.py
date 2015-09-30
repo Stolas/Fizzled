@@ -5,17 +5,22 @@ from os import listdir
 from os.path import isfile, join, abspath, expanduser
 from time import time, strftime
 import logging
-
-# Change this to your vdb path
-VDB_ROOT = "vivisect"
-sys.path.append(VDB_ROOT)
-
-import vtrace
-import vdb
-from envi.archs.i386 import *
 from settings import *
 
 logger = logging.getLogger('stalker')
+
+try:
+    # TODO: Add support for windbg / radare ?
+    sys.path.append(VDB_ROOT)
+    import vtrace
+    import vdb
+    from envi.archs.i386 import *
+    HAS_VDB = True
+    logger.debug('Vivisect found.')
+except ImportError:
+    HAS_VDB = False
+    logger.debug('Vivisect NOT found.')
+
 
 def run(data_dir, binary, args, time_format):
     file_list = [f for f in listdir(data_dir) if isfile(join(data_dir, f))]

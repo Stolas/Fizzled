@@ -3,17 +3,23 @@ import sys
 import logging
 from time import sleep
 from threading import Thread
-
-# Change this to your vdb path
-VDB_ROOT = "vivisect"
-sys.path.append(VDB_ROOT)
-
-import vtrace
-import vdb
-from envi.archs.i386 import *
+import subprocess
 from settings import *
 
 logger = logging.getLogger('autopsy')
+
+try:
+    # TODO: Add support for windbg / radare ?
+    sys.path.append(VDB_ROOT)
+    import vtrace
+    import vdb
+    from envi.archs.i386 import *
+    HAS_VDB = True
+    logger.debug('Vivisect found.')
+except (ImportError, NameError):
+    HAS_VDB = False
+    logger.debug('Vivisect NOT found.')
+
 
 
 def get_opcode(trace, eip):
@@ -63,11 +69,13 @@ def print_info(trace):
     logger.info("%16s: %s" % ("Direction", bool(ef & EFLAGS_DF)))
 
 
-def run(binary, args, ttl):
+def run_with_vivisect(binary, args, ttl):
     trace = vtrace.getTrace()
 
-    t = Thread(target = load_binary, args = (trace, binary, args))
+    logger.debug('Building Thread [{}]'.format(load_binary))
+    t = Thread(target=load_binary, args=(trace, binary, args))
     t.start()
+    logger.debug('Sleeping for {} seconds.'.format(ttl))
     sleep(ttl)
 
     if trace.isRunning():
@@ -75,9 +83,9 @@ def run(binary, args, ttl):
         print_info(trace)
 
         logger.info("Death to the process {}".format(trace.getPid()))
-        # logger.info("  (\  /)")
-        # logger.info(" ( .  .)")
-        # logger.info("C(\") (\"), done and no crash. Bunny is sad..")
+        logger.debug("  (\  /)")
+        logger.debug(" ( .  .)")
+        logger.debug("C(\") (\"), done and no crash. Bunny is sad..")
         trace.kill()
         trace.detach()
         sys.exit(0)
@@ -89,11 +97,29 @@ def run(binary, args, ttl):
         sys.exit(1)
 
 
+def run_simple(app, arg, ttl):
+    logger.debug('Starting {} {}'.format(app, arg))
+    process = subprocess.Popen([app] + arg)
+
+    sleep(ttl)
+    crashed = process.poll()
+    if crashed:
+        logger.error("Process crashed ({} <- {})".format(app, arg))
+        sys.exit(0)
+    else:
+        process.terminate()
+        sys.exit(1)
+
+
 def load_binary(trace, binary, args):
     execute_path = " ".join([binary] + args)
+    logger.debug('Executing {}'.format(execute_path))
     trace.execute(execute_path)
     trace.run()
 
 
 if __name__ == '__main__':
+    run = run_simple
+    if HAS_VDB:
+        run = run_with_vivisect
     run(BINARY, ARGUMENTS, TIME_TO_LIVE)
