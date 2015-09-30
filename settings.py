@@ -15,8 +15,10 @@ TIME_TO_LIVE = 1
 FILE_TYPE = 'pdf'
 RECOVER_TIME = 10
 TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
+# Set to path where vivisect can be found to use vivisect/vtrace/vdb
 # VDB_ROOT = 'vivisect'
 STRATEGY = 'charlie_miller_fuzz'
+MAX_TOTAL_MUTATIONS = 25000  # Set to None for unlimited.
 
 # Logging
 ## Formatting
@@ -53,7 +55,7 @@ mutilator.addHandler(stream_handler)
 autopsy = logging.getLogger('autopsy')
 autopsy.setLevel(logging.DEBUG)
 autopsy.addHandler(file_handler)
-# autopsy.addHandler(stream_handler)
+autopsy.addHandler(stream_handler)
 # autopsy.addHandler(syslog_handler)
 
 taskmaster = logging.getLogger('taskmaster')

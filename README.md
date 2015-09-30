@@ -30,8 +30,8 @@ Fizzled is a collection of fuzzing scripts. Which most of the time run but not f
 
 ## Quick start
 1. Setup Envoirment / Edit settings.py
-2. Run legion, this will fetch samples from the internet.
-3. Run stalker, find unique attributes in the code.
+2. ~~Run legion, this will fetch samples from the internet.~~
+3. ~~Run stalker, find unique attributes in the code.~~
 4. Run mutilator to create mutations.
 5. Run taskmaster.
 6. Read autopsy repotrs.
@@ -50,12 +50,16 @@ Starts autopsy and moves to crash if autopsy wants this.
 Autopsy runs the program, and stores the data.
 
 # legion.py
-Crawls the internet for files and download them to the data directory.
+~~Crawls the internet for files and download them to the data directory.~~
+Not yet build, for now use:
+    find / -type f -iname '*.pdf' -exec cp {} data/ \;
 
 # stalker.py
-Runs the target file and determines the execution path.
-Stores the fuzzy hash in a file.
+~~Runs the target file and determines the execution path.~~
+~~Stores the fuzzy hash in a file.~~
+Not yet build, for now accept that you waste power and CPU Cycles.
 
-# Syslog
-All programs use the logger for output, best to set this to syslog.
+# Logger
+All programs use the logger for output, best to set this to a central syslog server.
+For this you'll need settings.py
 

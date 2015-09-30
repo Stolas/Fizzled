@@ -5,6 +5,7 @@ import sys
 from random import choice
 from os import listdir
 from os.path import isfile, join, abspath, expanduser
+from time import strftime
 from strategy import charlie_miller_fuzz, radamsa_fuzz, bitflip_fuzz, nill_fuzz
 from settings import *
 
@@ -19,6 +20,10 @@ def run(seed_dir, samples_dir):
     itr = 0
     logger.info('Starting Mutilator with {}'.format(STRATEGY))
     while True:
+        if MAX_TOTAL_MUTATIONS:
+            if MAX_TOTAL_MUTATIONS < itr:
+                logger.warning('Reached the limit of {} mutations.'.format(MAX_TOTAL_MUTATIONS))
+                sys.exit(0)
         itr = itr + 1
         try:
             file_choice = join(seed_dir, choice(file_list))
@@ -33,7 +38,8 @@ def run(seed_dir, samples_dir):
         # Load & Run Mutation Strategy
         buf = globals()[STRATEGY](buf, itr)
 
-        new_filename = join(samples_dir, "sample_{}".format(itr))
+        stamp = strftime('%y%m%d%H%M%S')
+        new_filename = join(samples_dir, "sample_{}_{}".format(stamp, itr))
         logger.debug('Creating file: {}'.format(new_filename))
         fd = open(new_filename, 'wb')
         fd.write(buf)
