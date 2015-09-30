@@ -37,15 +37,15 @@ def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
         # Run autopsy
         ret = subprocess.call([abspath("autopsy.py"), work_file])
         if ret:
-            logger.info('{} crashed!'.format(work_file))
-            logger.debug('Moving: {} to {}'.format(work_file, crash_file))
-            move(work_file, crash_file)
-        else:
-            logger.info('{} didn\'t crash..')
+            logger.info('{} didn\'t crash..'.format(work_file))
 
             if destructive:
                 logger.warning('Deleting {}..'.format(work_file))
                 unlink(work_file)
+        else:
+            logger.info('{} crashed!'.format(work_file))
+            logger.debug('Moving: {} to {}'.format(work_file, crash_file))
+            move(work_file, crash_file)
 
 
 if __name__ == '__main__':

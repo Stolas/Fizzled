@@ -64,4 +64,3 @@ Not yet build, for now accept that you waste power and CPU Cycles.
 # Logger
 All programs use the logger for output, best to set this to a central syslog server.
 For this you'll need settings.py
-

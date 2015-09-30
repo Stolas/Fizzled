@@ -62,6 +62,7 @@ autopsy.addHandler(stream_handler)
 taskmaster = logging.getLogger('taskmaster')
 taskmaster.setLevel(logging.DEBUG)
 taskmaster.addHandler(stream_handler)
+taskmaster.addHandler(file_handler)
 
 ### Not in use as of yet.
 # stalker = logging.getLogger('stalker')
