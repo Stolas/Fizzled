@@ -9,14 +9,9 @@ from shutil import move
 from time import sleep
 import subprocess
 import logging
+from settings import *
 
-# TODO: Move this to a config file.
-# So I can easily log to the centralized server.
 logger = logging.getLogger('taskmaster')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-logger.addHandler(ch)
 
 def run(sample_dir, work_dir, crash_dir, recover_time):
     while True:
@@ -47,8 +42,4 @@ def run(sample_dir, work_dir, crash_dir, recover_time):
 
 
 if __name__ == '__main__':
-    SAMPLES_DIRECTORY = 'samples'
-    WORK_DIRECTORY = 'work'
-    CRASH_DIRECTORY = join(WORK_DIRECTORY, 'crash')
-    RECOVER_TIME = 10
     run(SAMPLES_DIRECTORY, WORK_DIRECTORY, CRASH_DIRECTORY, RECOVER_TIME)

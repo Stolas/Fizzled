@@ -11,14 +11,9 @@ sys.path.append(VDB_ROOT)
 import vtrace
 import vdb
 from envi.archs.i386 import *
+from settings import *
 
-# TODO: Move this to a config file.
-# So I can easily log to the centralized server.
 logger = logging.getLogger('autopsy')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-logger.addHandler(ch)
 
 
 def get_opcode(trace, eip):
@@ -101,8 +96,4 @@ def load_binary(trace, binary, args):
 
 
 if __name__ == '__main__':
-    # TODO: Also add this to config so we wont need to edit code.
-    BINARY = "/bin/ls"
-    TIME_TO_LIVE = 1
-    ARGUMENTS = ['-L'] + sys.argv[1:]
     run(BINARY, ARGUMENTS, TIME_TO_LIVE)

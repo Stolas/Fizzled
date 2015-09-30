@@ -13,14 +13,9 @@ sys.path.append(VDB_ROOT)
 import vtrace
 import vdb
 from envi.archs.i386 import *
+from settings import *
 
-# TODO: Move this to a config file.
-# So I can easily log to the centralized server.
 logger = logging.getLogger('stalker')
-logger.setLevel(logging.DEBUG)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-logger.addHandler(ch)
 
 def run(data_dir, binary, args, time_format):
     file_list = [f for f in listdir(data_dir) if isfile(join(data_dir, f))]
@@ -58,8 +53,4 @@ def run_trace(binary, args):
     return fuzzy_hash
 
 if __name__ == '__main__':
-    DATA_DIRECTORY = 'data'
-    BINARY = "/bin/ls"
-    ARGUMENTS = ['-L']
-    TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
     run(DATA_DIRECTORY, BINARY, ARGUMENTS, TIMESTAMP_FORMAT)
