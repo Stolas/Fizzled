@@ -29,7 +29,7 @@
 Fizzled is a collection of fuzzing scripts. Which most of the time run but not find anything.
 
 ## Quick start
-1. Run the config tool, answer the questions to configure Fizzled.
+1. Setup Envoirment / Edit settings.py
 2. Run legion, this will fetch samples from the internet.
 3. Run stalker, find unique attributes in the code.
 4. Run mutilator to create mutations.
@@ -55,10 +55,6 @@ Crawls the internet for files and download them to the data directory.
 # stalker.py
 Runs the target file and determines the execution path.
 Stores the fuzzy hash in a file.
-
-# config,py
-Can check if the config is correct, eg directorys exist.
-Also provides the other scripts with config loading functions.
 
 # Syslog
 All programs use the logger for output, best to set this to syslog.
