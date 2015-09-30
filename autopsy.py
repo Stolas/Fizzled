@@ -9,17 +9,40 @@ from settings import *
 logger = logging.getLogger('autopsy')
 
 try:
+    HAS_VDB = False
+    HAS_PYDBG = False
+    HAS_CTYPEDBG = False
+
     # TODO: Add support for windbg / radare ?
     sys.path.append(VDB_ROOT)
     import vtrace
     import vdb
     from envi.archs.i386 import *
     HAS_VDB = True
-    logger.debug('Vivisect found.')
+    logger.debug('Found vivisect.')
 except (ImportError, NameError):
-    HAS_VDB = False
-    logger.debug('Vivisect NOT found.')
+    pass #  Failed to load.
 
+try:
+    if HAS_VDB:
+        raise ImportError('Already found a debugger')
+
+    sys.path.append(PYDBG_ROOT)
+
+    import pydbg
+    HAS_PYDBG = True
+    logger.debug('Found pydbg.')
+except (ImportError, NameError):
+    pass #  Failed to load.
+
+try:
+    if HAS_VDB or HAS_PYDBG:
+        raise ImportError('Already found a debugger')
+
+    HAS_CTYPEDBG = True
+    logger.debug('Found pydbg.')
+except (ImportError, NameError):
+    pass #  Failed to load.
 
 
 def get_opcode(trace, eip):
@@ -96,6 +119,12 @@ def run_with_vivisect(binary, args, ttl):
         print_info(trace)
         sys.exit(1)
 
+def run_with_pydbg(app, arg, ttl):
+    raise NotImplementedError()
+
+
+def run_with_ctypes(app, arg, ttl):
+    raise NotImplementedError()
 
 def run_simple(app, arg, ttl):
     logger.debug('Starting {} {}'.format(app, arg))
@@ -122,4 +151,8 @@ if __name__ == '__main__':
     run = run_simple
     if HAS_VDB:
         run = run_with_vivisect
+    elif HAS_PYDBG:
+        run = run_with_pydbg
+    elif HAS_CTYPEDBG:
+        run = run_with_ctypes
     run(BINARY, ARGUMENTS, TIME_TO_LIVE)

@@ -1,3 +1,6 @@
 [submodule "vivisect"]
 	path = vivisect
 	url = git@github.com:vivisect/vivisect.git
+[submodule "pydbg"]
+	path = pydbg
+	url = git@github.com:OpenRCE/pydbg.git

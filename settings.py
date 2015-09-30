@@ -17,6 +17,7 @@ RECOVER_TIME = 10
 TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
 # Set to path where vivisect can be found to use vivisect/vtrace/vdb
 # VDB_ROOT = 'vivisect'
+# PYDBG_ROOT = '.'  # Note: Windows Only.
 STRATEGY = 'charlie_miller_fuzz'
 MAX_TOTAL_MUTATIONS = 2500  # Set to None for unlimited.
 DESTRUCTIVE = True
@@ -54,7 +55,7 @@ mutilator.addHandler(stream_handler)
 # mutilator.addHandler(syslog_handler)
 
 autopsy = logging.getLogger('autopsy')
-autopsy.setLevel(logging.DEBUG)
+autopsy.setLevel(logging.INFO)
 autopsy.addHandler(file_handler)
 autopsy.addHandler(stream_handler)
 # autopsy.addHandler(syslog_handler)
