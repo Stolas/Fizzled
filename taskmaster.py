@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from random import choice
-from os import listdir
+from os import listdir, unlink
 from os.path import isfile, join, abspath
 from shutil import move
 from time import sleep
@@ -10,7 +10,10 @@ from settings import *
 
 logger = logging.getLogger('taskmaster')
 
-def run(sample_dir, work_dir, crash_dir, recover_time):
+def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
+    if destructive:
+        logger.warning('Running in destructive mode')
+
     while True:
         file_list = [f for f in listdir(sample_dir) if isfile(join(sample_dir, f))]
         file_list.remove('.ignore')
@@ -40,6 +43,11 @@ def run(sample_dir, work_dir, crash_dir, recover_time):
         else:
             logger.info('{} didn\'t crash..')
 
+            if destructive:
+                logger.warning('Deleting {}..'.format(work_file))
+                unlink(work_file)
+
 
 if __name__ == '__main__':
-    run(SAMPLES_DIRECTORY, WORK_DIRECTORY, CRASH_DIRECTORY, RECOVER_TIME)
+    run(SAMPLES_DIRECTORY, WORK_DIRECTORY, CRASH_DIRECTORY,
+        RECOVER_TIME, DESTRUCTIVE)
