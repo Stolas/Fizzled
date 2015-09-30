@@ -4,25 +4,42 @@ from os.path import join
 from sys import argv
 import logging
 
-SEED_DIRECTORY = 'data'
-DATA_DIRECTORY = 'data'
-WORK_DIRECTORY = 'work'
-SAMPLES_DIRECTORY = 'samples'
-CRASH_DIRECTORY = join(WORK_DIRECTORY, 'crash')
-BINARY = "/usr/bin/evince"
-ARGUMENTS = [] + argv[1:]
-TIME_TO_LIVE = 1
-FILE_TYPE = 'pdf'
-RECOVER_TIME = 10
-TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
-# Set to path where vivisect can be found to use vivisect/vtrace/vdb
-# VDB_ROOT = 'vivisect'
-# PYDBG_ROOT = '.'  # Note: Windows Only.
-STRATEGY = 'charlie_miller_fuzz'
-MAX_TOTAL_MUTATIONS = 2500  # Set to None for unlimited.
-DESTRUCTIVE = True
 
+#
+# Directory Configurations
+#
+
+SEED_DIRECTORY = 'data'  # This folder keeps the original files.
+WORK_DIRECTORY = 'work'  # Files that are in use by workers.
+
+SAMPLES_DIRECTORY = 'samples'  # This is the folder that contains the TODO-Job.s
+CRASH_DIRECTORY = join(WORK_DIRECTORY, 'crash')  #  Crash Generators
+
+#
+# Test Subject
+#
+
+BINARY = "/usr/bin/evince"  # The test subject
+ARGUMENTS = [] + argv[1:]  # The argument list
+
+# Fuzzer Engine
+MAX_TOTAL_MUTATIONS = 2500  # Amount of testcases to build, None for unlimited.
+STRATEGY = 'charlie_miller_fuzz'  # Fuzzing Strategy in use.
+TIME_TO_LIVE = 1  # Seconds a bin should live to be alive.
+RECOVER_TIME = 10  # Time to wait for the mutator to create more jobs.
+DESTRUCTIVE = True  # Destroy the files that don't crash
+
+#
+# Debugger
+#
+
+# PYDBG_ROOT = '.'  # Note: Windows Only.
+# VDB_ROOT = 'vivisect'
+
+#
 # Logging
+#
+
 ## Formatting
 SIMPLE_FORMAT = logging.Formatter('%(name)s - %(message)s')
 CMD_LINE_FORMAT = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
@@ -36,17 +53,6 @@ stream_handler.setFormatter(CMD_LINE_FORMAT)
 file_handler = logging.FileHandler('fizzled.log')
 file_handler.setLevel(logging.DEBUG)
 
-# syslog_handler = logging.SysLogHandler(address=('localhost', 514))
-# syslog_handler.setLevel(logging.DEBUG)
-#
-# email_handler = logging.SMTPHandler('smtp.gmail.com',
-#                                     'from@gmail.com',
-#                                     'to@gmail.com',
-#                                     'Fizzled Info',
-#                                     ('username', 'password'),
-#                                     secure=True)
-#
-# email_handler.setLevel(logging.ERROR)
 
 ## Loggers
 mutilator = logging.getLogger('mutilator')
@@ -65,7 +71,26 @@ taskmaster.setLevel(logging.DEBUG)
 taskmaster.addHandler(stream_handler)
 taskmaster.addHandler(file_handler)
 
-### Not in use as of yet.
+#
+# Deprecated Settings
+#
+
+# DATA_DIRECTORY = 'data'
+# FILE_TYPE = 'pdf'  # FileType
+# TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
+
+# syslog_handler = logging.SysLogHandler(address=('localhost', 514))
+# syslog_handler.setLevel(logging.DEBUG)
+#
+# email_handler = logging.SMTPHandler('smtp.gmail.com',
+#                                     'from@gmail.com',
+#                                     'to@gmail.com',
+#                                     'Fizzled Info',
+#                                     ('username', 'password'),
+#                                     secure=True)
+#
+# email_handler.setLevel(logging.ERROR)
+
 # stalker = logging.getLogger('stalker')
 # stalker.setLevel(logging.DEBUG)
 # stalker.addHandler(stream_handler)

@@ -29,7 +29,7 @@ try:
 
     sys.path.append(PYDBG_ROOT)
 
-    import pydbg
+    import pydbg  # Reanimate
     HAS_PYDBG = True
     logger.debug('Found pydbg.')
 except (ImportError, NameError):
@@ -121,7 +121,6 @@ def run_with_vivisect(binary, args, ttl):
 
 def run_with_pydbg(app, arg, ttl):
     raise NotImplementedError()
-
 
 def run_with_ctypes(app, arg, ttl):
     raise NotImplementedError()
