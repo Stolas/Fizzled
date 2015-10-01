@@ -4,6 +4,7 @@ from os import listdir, unlink
 from os.path import isfile, join, abspath
 from shutil import move
 from time import sleep
+import sys
 import subprocess
 import logging
 from settings import *
@@ -35,7 +36,11 @@ def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
             continue
 
         # Run autopsy
-        ret = subprocess.call([abspath("autopsy.py"), work_file])
+        try:
+            ret = subprocess.call([abspath("autopsy.py"), work_file])
+        except WindowsError:
+            ret = subprocess.call([sys.executable, abspath("autopsy.py"), work_file])
+            
         if ret:
             logger.info('{} didn\'t crash..'.format(work_file))
 

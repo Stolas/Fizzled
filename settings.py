@@ -9,14 +9,14 @@ DATA_DIRECTORY = 'data'
 WORK_DIRECTORY = 'work'
 SAMPLES_DIRECTORY = 'samples'
 CRASH_DIRECTORY = join(WORK_DIRECTORY, 'crash')
-BINARY = "/usr/bin/evince"
+BINARY = "c:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe"
 ARGUMENTS = [] + argv[1:]
 TIME_TO_LIVE = 1
 FILE_TYPE = 'pdf'
 RECOVER_TIME = 10
 TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
 # Set to path where vivisect can be found to use vivisect/vtrace/vdb
-# VDB_ROOT = 'vivisect'
+VDB_ROOT = 'G:\\Exploit\\vivisect\\'
 # PYDBG_ROOT = '.'  # Note: Windows Only.
 STRATEGY = 'charlie_miller_fuzz'
 MAX_TOTAL_MUTATIONS = 2500  # Set to None for unlimited.

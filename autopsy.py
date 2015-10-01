@@ -39,8 +39,8 @@ try:
     if HAS_VDB or HAS_PYDBG:
         raise ImportError('Already found a debugger')
 
-    HAS_CTYPEDBG = True
-    logger.debug('Found pydbg.')
+    HAS_CTYPEDBG = False # True
+    logger.debug('Found ctypes.')
 except (ImportError, NameError):
     pass #  Failed to load.
 
@@ -103,7 +103,7 @@ def run_with_vivisect(binary, args, ttl):
 
     if trace.isRunning():
         trace.sendBreak()
-        print_info(trace)
+        # print_info(trace)
 
         logger.info("Death to the process {}".format(trace.getPid()))
         logger.debug("  (\  /)")
@@ -120,10 +120,12 @@ def run_with_vivisect(binary, args, ttl):
         sys.exit(1)
 
 def run_with_pydbg(app, arg, ttl):
+    logger.error('Not Implemented pydbg')
     raise NotImplementedError()
 
 
 def run_with_ctypes(app, arg, ttl):
+    logger.error('Nog Implemented ctypes')
     raise NotImplementedError()
 
 def run_simple(app, arg, ttl):
@@ -136,6 +138,7 @@ def run_simple(app, arg, ttl):
         logger.error("Process crashed ({} <- {})".format(app, arg))
         sys.exit(0)
     else:
+        logger.info('{} does not crash.'.format(arg))
         process.terminate()
         sys.exit(1)
 
