@@ -40,13 +40,15 @@ def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
             ret = subprocess.call([abspath("autopsy.py"), work_file])
         except WindowsError:
             ret = subprocess.call([sys.executable, abspath("autopsy.py"), work_file])
-            
         if ret:
             logger.info('{} didn\'t crash..'.format(work_file))
 
             if destructive:
                 logger.warning('Deleting {}..'.format(work_file))
-                unlink(work_file)
+                try:
+                    unlink(work_file)
+                except WindowsError:
+                    logger.error('File in use, can\'t delete it.')
         else:
             logger.info('{} crashed!'.format(work_file))
             logger.debug('Moving: {} to {}'.format(work_file, crash_file))

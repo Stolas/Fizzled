@@ -6,7 +6,7 @@ from random import choice
 from os import listdir
 from os.path import isfile, join, abspath, expanduser
 from time import strftime
-from strategy import charlie_miller_fuzz, radamsa_fuzz, bitflip_fuzz, nill_fuzz
+from strategy import *
 from settings import *
 
 
@@ -36,7 +36,10 @@ def run(seed_dir, samples_dir):
         fd.close()
 
         # Load & Run Mutation Strategy
-        buf = globals()[STRATEGY](buf, itr)
+        try:
+            buf = globals()[STRATEGY](buf, itr)
+        except KeyError:
+            logger.fatal('Strategy {} does not exist.'.format(STRATEGY))
 
         stamp = strftime('%y%m%d%H%M%S')
         new_filename = join(samples_dir, "sample_{}_{}".format(stamp, itr))

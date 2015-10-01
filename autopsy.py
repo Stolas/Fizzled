@@ -7,6 +7,8 @@ import subprocess
 from settings import *
 
 logger = logging.getLogger('autopsy')
+CRASH_RETURN = 0
+NO_CRASH_RETURN = 1
 
 try:
     HAS_VDB = False
@@ -111,13 +113,13 @@ def run_with_vivisect(binary, args, ttl):
         logger.debug("C(\") (\"), done and no crash. Bunny is sad..")
         trace.kill()
         trace.detach()
-        sys.exit(0)
+        sys.exit(NO_CRASH_RETURN)
     else:
         # TODO: Seems that isRunning isn't working that well.
         logger.info("{} crashed!".format(binary))
         logger.info("Arguments: {}".format(', '.join(args)))
         print_info(trace)
-        sys.exit(1)
+        sys.exit(CRASH_RETURN)
 
 def run_with_pydbg(app, arg, ttl):
     logger.error('Not Implemented pydbg')
@@ -136,11 +138,11 @@ def run_simple(app, arg, ttl):
     crashed = process.poll()
     if crashed:
         logger.error("Process crashed ({} <- {})".format(app, arg))
-        sys.exit(0)
+        sys.exit(CRASH_RETURN)
     else:
         logger.info('{} does not crash.'.format(arg))
         process.terminate()
-        sys.exit(1)
+        sys.exit(NO_CRASH_RETURN)
 
 
 def load_binary(trace, binary, args):

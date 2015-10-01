@@ -1,7 +1,8 @@
 import math
 import sys
+import re
 import logging
-from random import randrange
+from random import randrange, choice
 
 logger = logging.getLogger('mutilator')
 
@@ -28,7 +29,7 @@ def radamsa_fuzz(buf, itr):
 def bitflip_fuzz(buf, itr):
     raise NotImplementedError()
 
-def totoro_fuz(buf, itr):
+def smart_fuzz(buf, itr):
     ##                                    ##
     #  _____            Tororo             #
     # /     \             is fuzzy         #
@@ -41,18 +42,18 @@ def totoro_fuz(buf, itr):
     ##                                    ##
 
     int_overflow = [
-        -1,
+        # -1,
         0,
-        0x100,
-        0x1000,
-        0x3fffffff,
-        0x7ffffffe,
-        0x7fffffff,
-        0x80000000,
-        0xfffffffe,
-        0xffffffff,
+        # 0x100,
+        # 0x1000,
+        # 0x3fffffff,
+        # 0x7ffffffe,
+        # 0x7fffffff,
+        # 0x80000000,
+        # 0xfffffffe,
+        # 0xffffffff,
         0x10000,
-        0x100000,
+        # 0x100000,
     ]
 
     format_strings = [
@@ -81,9 +82,65 @@ def totoro_fuz(buf, itr):
         "A"*8192,
     ]
 
-    rnd_idx = randrage(len(buf))
+    rnd_idx = randrange(len(buf))
     rand_byte = buf[rnd_idx]
+
+    # if re.match('[a-zA-Z]', chr(rand_byte)):
+    #     # String Match
+    #     print('Found a string [%c] @ 0x%x' % (rand_byte, rnd_idx))
+    idx = rnd_idx
+    buff_start = 0
+    buff_end = 0
+    e_buff = []
+
+    # Found a string, find the beginning of the string
+    if re.match('[A-Za-z]', chr(buf[idx])):
+        # print('Found rnd byte [%c] @ 0x%x' % (buf[idx], idx))
+        while re.match('[A-Za-z]', chr(buf[idx])):
+            # print('Found Str Byte [%c] @ 0x%x' % (buf[idx], idx))
+            idx = idx - 1
+        idx = idx + 1
+        buff_start = idx
+        try:
+            while re.match('[A-Za-z]', chr(buf[idx])):
+                e_buff.append(chr(buf[idx]))
+                idx = idx + 1
+        except IndexError:
+            pass
+        buff_end = idx - 1
+        fuzz_list = overflow_strings + format_strings
+    # Found an int, find the beginning of the int
+    elif re.match('\d', chr(buf[idx])):
+        # print('Found rnd byte [%c] @ 0x%x' % (buf[idx], idx))
+        while re.match('\d', chr(buf[idx])):
+            # print('Found Str Byte [%c] @ 0x%x' % (buf[idx], idx))
+            idx = idx - 1
+        idx = idx + 1
+        buff_start = idx
+        while re.match('\d', chr(buf[idx])):
+            # print('[FOUND INT]')
+            e_buff.append(chr(buf[idx]))
+            idx = idx + 1
+        buff_end = idx - 1
+        fuzz_list = int_overflow
+    else:
+        fuzz_list = [randrange(0xff)]  # Dunno lets make this a random_byte
+
+    if buff_start != buff_end:
+        try:
+            print('Buff {}-{} found {}'.format(buff_start, buff_end, e_buff))
+            buff_begin = bytearray(buf[:buff_start])
+            buff_end = bytearray(buf[buff_end:])
+            fuzz_value = bytearray(choice(fuzz_list))
+            buf = buff_begin + fuzz_value + buff_end
+        except MemoryError as ex:
+            import pdb ; pdb.set_trace()
+
+    # if itr > 150:
+    #     import pdb ; pdb.set_trace()
     # if rand_byte == [A-Z]
+
+    return buf
 
 
 def nill_fuzz(buf, itr):

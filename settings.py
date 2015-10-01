@@ -18,8 +18,8 @@ TIMESTAMP_FORMAT = "%B %dth, %l:%M %p"
 # Set to path where vivisect can be found to use vivisect/vtrace/vdb
 VDB_ROOT = 'G:\\Exploit\\vivisect\\'
 # PYDBG_ROOT = '.'  # Note: Windows Only.
-STRATEGY = 'charlie_miller_fuzz'
-MAX_TOTAL_MUTATIONS = 2500  # Set to None for unlimited.
+STRATEGY = 'smart_fuzz'  # 'charlie_miller_fuzz'
+MAX_TOTAL_MUTATIONS = 6000  # Set to None for unlimited.
 DESTRUCTIVE = True
 
 # Logging
