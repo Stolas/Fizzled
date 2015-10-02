@@ -4,9 +4,10 @@ import logging
 from time import sleep
 from threading import Thread
 import subprocess
-from settings import *
 
 logger = logging.getLogger('autopsy')
+CRASH_RETURN = 0
+NO_CRASH_RETURN = 1
 
 try:
     HAS_VDB = False
@@ -39,8 +40,8 @@ try:
     if HAS_VDB or HAS_PYDBG:
         raise ImportError('Already found a debugger')
 
-    HAS_CTYPEDBG = True
-    logger.debug('Found pydbg.')
+    HAS_CTYPEDBG = False # True
+    logger.debug('Found ctypes.')
 except (ImportError, NameError):
     pass #  Failed to load.
 
@@ -103,7 +104,7 @@ def run_with_vivisect(binary, args, ttl):
 
     if trace.isRunning():
         trace.sendBreak()
-        print_info(trace)
+        # print_info(trace)
 
         logger.info("Death to the process {}".format(trace.getPid()))
         logger.debug("  (\  /)")
@@ -111,18 +112,20 @@ def run_with_vivisect(binary, args, ttl):
         logger.debug("C(\") (\"), done and no crash. Bunny is sad..")
         trace.kill()
         trace.detach()
-        sys.exit(0)
+        return NO_CRASH_RETURN
     else:
         # TODO: Seems that isRunning isn't working that well.
         logger.info("{} crashed!".format(binary))
         logger.info("Arguments: {}".format(', '.join(args)))
         print_info(trace)
-        sys.exit(1)
+        return CRASH_RETURN
 
 def run_with_pydbg(app, arg, ttl):
+    logger.error('Not Implemented pydbg')
     raise NotImplementedError()
 
 def run_with_ctypes(app, arg, ttl):
+    logger.error('Nog Implemented ctypes')
     raise NotImplementedError()
 
 def run_simple(app, arg, ttl):
@@ -133,11 +136,22 @@ def run_simple(app, arg, ttl):
     crashed = process.poll()
     if crashed:
         logger.error("Process crashed ({} <- {})".format(app, arg))
-        sys.exit(0)
+        return CRASH_RETURN
     else:
+        logger.info('{} does not crash.'.format(arg))
         process.terminate()
-        sys.exit(1)
+        return NO_CRASH_RETURN
 
+def run(app, arg, ttl):
+    real_run = run_simple
+    if HAS_VDB:
+        real_run = run_with_vivisect
+    elif HAS_PYDBG:
+        real_run = run_with_pydbg
+    elif HAS_CTYPEDBG:
+        real_run = run_with_ctypes
+
+    return real_run(app, arg, ttl)
 
 def load_binary(trace, binary, args):
     execute_path = " ".join([binary] + args)
@@ -145,13 +159,7 @@ def load_binary(trace, binary, args):
     trace.execute(execute_path)
     trace.run()
 
-
 if __name__ == '__main__':
-    run = run_simple
-    if HAS_VDB:
-        run = run_with_vivisect
-    elif HAS_PYDBG:
-        run = run_with_pydbg
-    elif HAS_CTYPEDBG:
-        run = run_with_ctypes
-    run(BINARY, ARGUMENTS, TIME_TO_LIVE)
+    from settings import *
+    ret = run(BINARY, ARGUMENTS, TIME_TO_LIVE)
+    sys.exit(ret)

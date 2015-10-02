@@ -3,14 +3,15 @@ from random import choice
 from os import listdir, unlink
 from os.path import isfile, join, abspath
 from shutil import move
+from autopsy import run as run_autopsy
 from time import sleep
+import sys
 import subprocess
 import logging
-from settings import *
 
 logger = logging.getLogger('taskmaster')
 
-def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
+def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destructive):
     if destructive:
         logger.warning('Running in destructive mode')
 
@@ -35,13 +36,17 @@ def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
             continue
 
         # Run autopsy
-        ret = subprocess.call([abspath("autopsy.py"), work_file])
+        ret = run_autopsy(binary, args + [work_file], ttl)
+
         if ret:
             logger.info('{} didn\'t crash..'.format(work_file))
 
             if destructive:
                 logger.warning('Deleting {}..'.format(work_file))
-                unlink(work_file)
+                try:
+                    unlink(work_file)
+                except WindowsError:
+                    logger.error('File in use, can\'t delete it.')
         else:
             logger.info('{} crashed!'.format(work_file))
             logger.debug('Moving: {} to {}'.format(work_file, crash_file))
@@ -49,5 +54,7 @@ def run(sample_dir, work_dir, crash_dir, recover_time, destructive):
 
 
 if __name__ == '__main__':
-    run(SAMPLES_DIRECTORY, WORK_DIRECTORY, CRASH_DIRECTORY,
-        RECOVER_TIME, DESTRUCTIVE)
+    from settings import *
+    run(BINARY, ARGUMENTS, TIME_TO_LIVE,
+        SAMPLES_DIRECTORY, WORK_DIRECTORY,
+        CRASH_DIRECTORY, RECOVER_TIME, DESTRUCTIVE)

@@ -6,23 +6,22 @@ from random import choice
 from os import listdir
 from os.path import isfile, join, abspath, expanduser
 from time import strftime
-from strategy import charlie_miller_fuzz, radamsa_fuzz, bitflip_fuzz, nill_fuzz
-from settings import *
+from strategy import *
 
 
 logger = logging.getLogger('mutilator')
 
 
-def run(seed_dir, samples_dir):
+def run(seed_dir, samples_dir, strategy, max_total_mutations):
     file_list = [f for f in listdir(seed_dir) if isfile(join(seed_dir, f))]
     file_list.remove('.ignore')
 
     itr = 0
-    logger.info('Starting Mutilator with {}'.format(STRATEGY))
+    logger.info('Starting Mutilator with {}'.format(strategy))
     while True:
-        if MAX_TOTAL_MUTATIONS:
-            if MAX_TOTAL_MUTATIONS < itr:
-                logger.warning('Reached the limit of {} mutations.'.format(MAX_TOTAL_MUTATIONS))
+        if max_total_mutations:
+            if max_total_mutations < itr:
+                logger.warning('Reached the limit of {} mutations.'.format(max_total_mutations))
                 sys.exit(0)
         itr = itr + 1
         try:
@@ -36,7 +35,10 @@ def run(seed_dir, samples_dir):
         fd.close()
 
         # Load & Run Mutation Strategy
-        buf = globals()[STRATEGY](buf, itr)
+        try:
+            buf = globals()[strategy](buf, itr)
+        except KeyError:
+            logger.fatal('Strategy {} does not exist.'.format(strategy))
 
         stamp = strftime('%y%m%d%H%M%S')
         new_filename = join(samples_dir, "sample_{}_{}".format(stamp, itr))
@@ -48,4 +50,5 @@ def run(seed_dir, samples_dir):
 
 
 if __name__ == '__main__':
-    run(SEED_DIRECTORY, SAMPLES_DIRECTORY)
+    from settings import *
+    run(SEED_DIRECTORY, SAMPLES_DIRECTORY, STRATEGY, MAX_TOTAL_MUTATIONS)

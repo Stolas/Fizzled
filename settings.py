@@ -20,7 +20,7 @@ CRASH_DIRECTORY = join(WORK_DIRECTORY, 'crash')  #  Crash Generators
 #
 
 BINARY = "/usr/bin/evince"  # The test subject
-ARGUMENTS = [] + argv[1:]  # The argument list
+ARGUMENTS = []  # The argument list
 
 # Fuzzer Engine
 MAX_TOTAL_MUTATIONS = 2500  # Amount of testcases to build, None for unlimited.
