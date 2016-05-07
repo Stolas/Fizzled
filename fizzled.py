@@ -3,11 +3,11 @@
 from argparse import ArgumentParser
 from threading import Thread
 from time import sleep
+from lackey import Lackey
 import sys
 import mutilator
 import taskmaster
 import autopsy
-import lackey
 
 AVAILABLE_TOOLS = ['mutilator', 'taskmaster', 'autopsy', 'auto']
 BANNER = " ______ _         _          _\n"\
@@ -79,8 +79,8 @@ class Fizzled():
         elif self.tool == 'auto':
 
             if self.run_lackey:
-                worker = Thread(target=self.lackey_worker)
-                worker.start()
+                lackey_thread = Thread(target=self.lackey_worker)
+                lackey_thread.start()
 
             worker = Thread(target=self.mutilator_worker)
             worker.start()
@@ -95,9 +95,17 @@ class Fizzled():
                            self.destructive,
                            self.debugger)
 
+    def exit(self):
+        if self.lackey:
+            self.lackey.exit()
+        sys.exit(0)
+
     def lackey_worker(self):
         # TODO: Fix the bug that this doesn't exit on KeyBoardExit.
-        lackey.run(self.server_ip, self.server_port)
+        self.lackey = Lackey(self.server_ip, self.server_port,
+                            self.seed_dir, self.samples_dir,
+                            self.crash_dir)
+        self.lackey.run()
 
     def mutilator_worker(self):
         while True:
@@ -107,5 +115,8 @@ class Fizzled():
 
 
 if __name__ == '__main__':
-    fizz = Fizzled()
-    fizz.run()
+    try:
+        fizz = Fizzled()
+        fizz.run()
+    except KeyboardInterrupt:
+        fizz.exit()

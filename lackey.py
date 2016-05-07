@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+from datetime import datetime
 from json import dumps as json_encode
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
@@ -11,21 +12,36 @@ class LackeyHandler(BaseHTTPRequestHandler):
         sender.send_header('Content-Type', 'application/json')
         sender.end_headers()
 
-        data = {'status': 'TODO'}
+        data = dict()
+
+        data['time'] = dict()
+        now = datetime.now()
+        data['time']['year'] = now.year
+        data['time']['month'] = now.month
+        data['time']['day'] = now.day
+        data['time']['hour'] = now.hour
+        data['time']['minute'] = now.minute
+        data['time']['second'] = now.second
+
+        # TODO: Return file counts of folders.
+        # TODO: Create a call to read files.
+        # TODO: Add SSL
+        # TODO: Add Authentication Tokens
+
         sender.wfile.write(json_encode(data))
 
-def run(hostname, port):
-    logger.info('Lackey listening at {}:{}'.format(hostname, port))
-    httpd = HTTPServer((hostname, port), LackeyHandler)
-    try:
-        # TODO: Set logger for httpd
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpd.server_close()
-    logger.debug('Lackey shutdown at {}:{}')
+class Lackey():
+    def __init__(self,hostname, port, seed_dir, samples_dir, crash_dir):
+        logger.info('Lackey listening at {}:{}'.format(hostname, port))
+        self.httpd = HTTPServer((hostname, port), LackeyHandler)
+        self.seed_dir = seed_dir
+        self.samples_dir = samples_dir
+        self.crash_dir = crash_dir
 
-if __name__ == '__main__':
-    from settings import *
-    ret = run(SERVER_IP, SERVER_PORT)
-    sys.exit(ret)
+    def run(self):
+        # TODO: Set logger for httpd
+        self.httpd.serve_forever()
+        logger.debug('Lackey shutdown at {}:{}')
+
+    def exit(self):
+        self.httpd.server_close()
