@@ -51,6 +51,12 @@ def get_opcode(trace, eip):
     op1 = trace.makeOpcode(s, 0, eip)
     return op1
 
+def load_binary(trace, binary, args):
+    execute_path = " ".join([binary] + args)
+    logger.debug('Executing {}'.format(execute_path))
+    trace.execute(execute_path)
+    trace.run()
+
 def print_info(trace):
     # logger.info("META: %s") % (trace.metadata)
     eip = trace.getRegister(REG_EIP)
@@ -138,28 +144,34 @@ def run_simple(app, arg, ttl):
         logger.error("Process crashed ({} <- {})".format(app, arg))
         return CRASH_RETURN
     else:
-        logger.info('{} does not crash.'.format(arg))
+        logger.warning('{} does not crash.'.format(arg))
         process.terminate()
         return NO_CRASH_RETURN
 
-def run(app, arg, ttl):
-    real_run = run_simple
-    if HAS_VDB:
-        real_run = run_with_vivisect
-    elif HAS_PYDBG:
-        real_run = run_with_pydbg
-    elif HAS_CTYPEDBG:
-        real_run = run_with_ctypes
+def run(app, arg, ttl, debugger):
+    debugger_ok = lambda x: (debugger != None or debugger == x)
 
-    return real_run(app, arg, ttl)
+    if debugger_ok('vdb'):
+        if HAS_VDB:
+            return run_with_vivisect(app, arg, ttl)
 
-def load_binary(trace, binary, args):
-    execute_path = " ".join([binary] + args)
-    logger.debug('Executing {}'.format(execute_path))
-    trace.execute(execute_path)
-    trace.run()
+    elif debugger_ok('pydbg'):
+        if HAS_PYDBG:
+            return run_with_pydbg(app, arg, ttl)
+
+    elif debugger_ok('ctype'):
+        if HAS_CTYPEDBG:
+            return run_with_ctypes(app, arg, ttl)
+    else:
+        if debugger:
+            logger.debug('Debugger of choice {} not found, using fallback debugger.'.format(debugger))
+
+    if debugger:
+        logger.debug('Required library for {} not found, using fallback debugger.'.format(debugger))
+
+    return run_simple(app, arg, ttl)
 
 if __name__ == '__main__':
     from settings import *
-    ret = run(BINARY, ARGUMENTS, TIME_TO_LIVE)
+    ret = run(BINARY, ARGUMENTS, TIME_TO_LIVE, DEBUGGER)
     sys.exit(ret)

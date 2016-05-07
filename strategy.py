@@ -29,7 +29,7 @@ def radamsa_fuzz(buf, itr):
 def bitflip_fuzz(buf, itr):
     raise NotImplementedError()
 
-def smart_fuzz(buf, itr):
+def totoro_fuzz(buf, itr):
     ##                                    ##
     #  _____            Tororo             #
     # /     \             is fuzzy         #

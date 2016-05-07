@@ -44,7 +44,7 @@ def run(seed_dir, samples_dir, strategy, max_total_mutations):
             logger.fatal('Strategy {} does not exist.'.format(strategy))
 
         stamp = strftime('%y%m%d%H%M%S')
-        new_filename = join(samples_dir, "sample_{}_{}".format(stamp, itr))
+        new_filename = join(samples_dir, 'sample_{}_{}'.format(stamp, itr))
         logger.debug('Creating file: {}'.format(new_filename))
         fd = open(new_filename, 'wb')
         fd.write(buf)

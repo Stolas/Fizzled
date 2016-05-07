@@ -7,6 +7,7 @@ import sys
 import mutilator
 import taskmaster
 import autopsy
+import lackey
 
 AVAILABLE_TOOLS = ['mutilator', 'taskmaster', 'autopsy', 'auto']
 BANNER = " ______ _         _          _\n"\
@@ -23,7 +24,7 @@ class Fizzled():
         parser = ArgumentParser()
         parser.add_argument('--tool', choices=AVAILABLE_TOOLS, required=True)
         parser.add_argument('--settings', default='settings')
-        # parser.add_argument('--daemonize')
+        parser.add_argument('--daemonize', action='store_true')
         parser.add_argument('--no-banner', action='store_true')
         # TODO: More and less verbose
 
@@ -31,6 +32,9 @@ class Fizzled():
 
         self.tool = args.tool
         self.settings_file = args.settings
+
+        if args.daemonize:
+            raise NotImplemented()
 
         # Parse Settings
         settings = __import__(self.settings_file)
@@ -43,8 +47,12 @@ class Fizzled():
         self.ttl = settings.TIME_TO_LIVE
         self.recover_time = settings.RECOVER_TIME
         self.destructive = settings.DESTRUCTIVE
+        self.debugger = settings.DEBUGGER
         self.strategy = settings.STRATEGY
         self.max_total_mutations = settings.MAX_TOTAL_MUTATIONS
+        self.run_lackey = settings.RUN_LACKEY
+        self.server_ip = settings.SERVER_IP
+        self.server_port = settings.SERVER_PORT
 
         if not args.no_banner:
             print(BANNER)
@@ -62,12 +70,18 @@ class Fizzled():
                            self.work_dir,
                            self.crash_dir,
                            self.recover_time,
-                           self.destructive)
+                           self.destructive,
+                           self.debugger)
 
         elif self.tool == 'autopsy':
             autopsy.run(self.binary, self.fuzz_args, self.ttl)
 
         elif self.tool == 'auto':
+
+            if self.run_lackey:
+                worker = Thread(target=self.lackey_worker)
+                worker.start()
+
             worker = Thread(target=self.mutilator_worker)
             worker.start()
 
@@ -78,7 +92,12 @@ class Fizzled():
                            self.work_dir,
                            self.crash_dir,
                            self.recover_time,
-                           self.destructive)
+                           self.destructive,
+                           self.debugger)
+
+    def lackey_worker(self):
+        # TODO: Fix the bug that this doesn't exit on KeyBoardExit.
+        lackey.run(self.server_ip, self.server_port)
 
     def mutilator_worker(self):
         while True:

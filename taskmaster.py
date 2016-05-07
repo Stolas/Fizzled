@@ -11,7 +11,7 @@ import logging
 
 logger = logging.getLogger('taskmaster')
 
-def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destructive):
+def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destructive, debugger):
     if destructive:
         logger.warning('Running in destructive mode')
 
@@ -42,7 +42,7 @@ def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destru
         if isinstance(args, str):
             args = [args]
 
-        ret = run_autopsy(binary, args + [work_file], ttl)
+        ret = run_autopsy(binary, args + [work_file], ttl, debugger)
 
         if ret:
             logger.info('{} didn\'t crash..'.format(work_file))
@@ -63,4 +63,5 @@ if __name__ == '__main__':
     from settings import *
     run(BINARY, ARGUMENTS, TIME_TO_LIVE,
         SAMPLES_DIRECTORY, WORK_DIRECTORY,
-        CRASH_DIRECTORY, RECOVER_TIME, DESTRUCTIVE)
+        CRASH_DIRECTORY, RECOVER_TIME,
+        DESTRUCTIVE, DEBUGGER)
