@@ -17,7 +17,10 @@ def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destru
 
     while True:
         file_list = [f for f in listdir(sample_dir) if isfile(join(sample_dir, f))]
-        file_list.remove('.ignore')
+        try:
+            file_list.remove('.ignore')
+        except ValueError:
+            pass
 
         # I grab a random one, as next will lead to collisions
         try:
@@ -36,6 +39,9 @@ def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destru
             continue
 
         # Run autopsy
+        if isinstance(args, str):
+            args = [args]
+
         ret = run_autopsy(binary, args + [work_file], ttl)
 
         if ret:

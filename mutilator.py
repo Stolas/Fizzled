@@ -14,7 +14,10 @@ logger = logging.getLogger('mutilator')
 
 def run(seed_dir, samples_dir, strategy, max_total_mutations):
     file_list = [f for f in listdir(seed_dir) if isfile(join(seed_dir, f))]
-    file_list.remove('.ignore')
+    try:
+        file_list.remove('.ignore')
+    except ValueError:
+        pass
 
     itr = 0
     logger.info('Starting Mutilator with {}'.format(strategy))
@@ -27,7 +30,7 @@ def run(seed_dir, samples_dir, strategy, max_total_mutations):
         try:
             file_choice = join(seed_dir, choice(file_list))
         except IndexError:
-            logger.error('No seeds found')
+            logger.error('No seeds found in {}'.format(seed_dir))
             sys.exit(1)
 
         fd = open(abspath(file_choice), 'rb')
