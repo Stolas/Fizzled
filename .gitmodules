@@ -4,3 +4,6 @@
 [submodule "pydbg"]
 	path = pydbg
 	url = git@github.com:OpenRCE/pydbg.git
+[submodule "radamsa"]
+	path = radamsa
+	url = git@github.com:aoh/radamsa.git
