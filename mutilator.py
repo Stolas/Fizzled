@@ -12,7 +12,7 @@ from strategy import *
 logger = logging.getLogger('mutilator')
 
 
-def run(seed_dir, samples_dir, strategy, max_total_mutations):
+def run(seed_dir, samples_dir, strategy, max_total_mutations, strategy_args=dict()):
     file_list = [f for f in listdir(seed_dir) if isfile(join(seed_dir, f))]
     try:
         file_list.remove('.ignore')
@@ -39,9 +39,12 @@ def run(seed_dir, samples_dir, strategy, max_total_mutations):
 
         # Load & Run Mutation Strategy
         try:
-            buf = globals()[strategy](buf, itr)
+            # TODO : Allow to set strategy_args with --tool mutilator or when mutilator is standalone
+            buf = globals()[strategy](buf, itr, **strategy_args)
         except KeyError:
             logger.fatal('Strategy {} does not exist.'.format(strategy))
+        except TypeError:
+            logger.fatal('Strategy {} is missing arguments.'.format(strategy))
 
         stamp = strftime('%y%m%d%H%M%S')
         new_filename = join(samples_dir, 'sample_{}_{}'.format(stamp, itr))

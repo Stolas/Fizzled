@@ -6,7 +6,6 @@ from shutil import move
 from autopsy import run as run_autopsy
 from time import sleep
 import sys
-import subprocess
 import logging
 
 logger = logging.getLogger('taskmaster')
@@ -42,7 +41,8 @@ def run(binary, args, ttl, sample_dir, work_dir, crash_dir, recover_time, destru
         if isinstance(args, str):
             args = [args]
 
-        ret = run_autopsy(binary, args + [work_file], ttl, debugger)
+        args = [a.format(filename=work_file) for a in args]
+        ret = run_autopsy(binary, args, ttl, debugger)
 
         if ret:
             logger.info('{} didn\'t crash..'.format(work_file))

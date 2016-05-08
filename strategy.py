@@ -2,6 +2,8 @@ import math
 import sys
 import re
 import logging
+import subprocess
+from tempfile import TemporaryFile
 from random import randrange, choice
 
 logger = logging.getLogger('mutilator')
@@ -23,8 +25,16 @@ def charlie_miller_fuzz(buf, itr):
 
     return buf
 
-def radamsa_fuzz(buf, itr):
-    raise NotImplementedError()
+def radamsa_fuzz(buf, itr, radamsa_bin):
+    fd = TemporaryFile()
+    fd.write(buf)
+    fd.seek(0, 0)
+    process = subprocess.Popen([radamsa_bin], stdin=fd,
+              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    (buf, err) = process.communicate()
+    if err:
+        logger.error('Radamsa error: {}'.format(err))
+    return buf
 
 def bitflip_fuzz(buf, itr):
     raise NotImplementedError()

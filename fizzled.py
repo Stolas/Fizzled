@@ -50,6 +50,7 @@ class Fizzled():
         self.debugger = settings.DEBUGGER
         self.strategy = settings.STRATEGY
         self.max_total_mutations = settings.MAX_TOTAL_MUTATIONS
+        self.radamsa_bin = settings.RADAMSA_BIN
         self.run_lackey = settings.RUN_LACKEY
         self.server_ip = settings.SERVER_IP
         self.server_port = settings.SERVER_PORT
@@ -96,8 +97,10 @@ class Fizzled():
                            self.debugger)
 
     def exit(self):
-        if self.lackey:
+        try:
             self.lackey.exit()
+        except AttributeError:
+            pass
         sys.exit(0)
 
     def lackey_worker(self):
@@ -108,9 +111,13 @@ class Fizzled():
         self.lackey.run()
 
     def mutilator_worker(self):
+        strategy_args = dict()
+        strategy_args['radamsa_bin'] = self.radamsa_bin
+
         while True:
             mutilator.run(self.seed_dir, self.samples_dir,
-                          self.strategy, self.max_total_mutations)
+                          self.strategy, self.max_total_mutations,
+                          strategy_args)
             sleep(self.recover_time)
 
 
